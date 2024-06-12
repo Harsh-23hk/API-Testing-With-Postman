@@ -1,0 +1,415 @@
+{
+	"info": {
+		"_postman_id": "243433db-8abf-4c8d-9ca6-d1266bd6743c",
+		"name": "Spotify",
+		"description": "# Authentication:\n\nThis collection needs 3 tier Authentication.\n\n## 1) App Level -\n\n[https://developer.spotify.com/documentation/general/guides/app-settings/#register-your-app](https://developer.spotify.com/documentation/general/guides/app-settings/#register-your-app)\n\n## 2) User Level -\n\n[https://developer.spotify.com/documentation/general/guides/authorization-guide/#client-credentials-flow](https://developer.spotify.com/documentation/general/guides/authorization-guide/#client-credentials-flow)\n\n## 3) Scope Level -\n\n[https://developer.spotify.com/documentation/general/guides/authorization-guide/#scopes](https://developer.spotify.com/documentation/general/guides/authorization-guide/#scopes)",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "25639716"
+	},
+	"item": [
+		{
+			"name": "ABOUT ME",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Verify for user \", function () {\r",
+							"     var responseJSON = pm.response.json();\r",
+							"     pm.expect(responseJSON.display_name).to.equals('Harsh');\r",
+							"     pm.expect(responseJSON.email).to.equals('rhodes.cody608@gmail.com');\r",
+							"});\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseURL}}me",
+					"host": [
+						"{{baseURL}}me"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "USER PROFILE",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseURL}}users/{{user_id}}",
+					"host": [
+						"{{baseURL}}users"
+					],
+					"path": [
+						"{{user_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "My Playlists",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"\r",
+							"pm.test(\"Check all playlist IDs in the response\", function () {\r",
+							"    var responseData = pm.response.json();\r",
+							"    responseData.items.forEach((playlist) => {\r",
+							"        pm.expect(playlist).to.have.property('id').that.is.a('string');\r",
+							"    });\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Set any playlist ID as the value for the 'playlistIds' variable\", function () {\r",
+							"    var responseData = pm.response.json();\r",
+							"    var playlistIds = responseData.items.map(playlist => playlist.id);\r",
+							"\r",
+							"    pm.collectionVariables.set(\"playlistIds\", playlistIds[0]);\r",
+							"});\r",
+							"\r",
+							"// Set a random playlist ID from the response as a collection variable\r",
+							"pm.test(\"Set a random playlistId from playlistIds as a Collection variable and ensure it changes at every run\", function () {\r",
+							"    var responseData = pm.response.json();\r",
+							"    var playlistIds = responseData.items.map(playlist => playlist.id);\r",
+							"    \r",
+							"    // Set a random playlist ID as the value for the 'playlistIds' collection variable\r",
+							"    var randomPlaylistId = playlistIds[Math.floor(Math.random() * playlistIds.length)];\r",
+							"    pm.collectionVariables.set(\"playlistIds\", randomPlaylistId);\r",
+							"    \r",
+							"    // Check if the collection variable value changes at every run\r",
+							"    //pm.expect(pm.collectionVariables.get(\"playlistIds\")).to.not.equal(randomPlaylistId);\r",
+							"});\r",
+							"\r",
+							"pm.execution.setNextRequest(\"PlaylistImage\");"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{baseURL}}users/{{user_id}}/playlists",
+					"host": [
+						"{{baseURL}}users"
+					],
+					"path": [
+						"{{user_id}}",
+						"playlists"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "PlaylistImage",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseURL}}playlists/{{playlistIds}}/images",
+					"host": [
+						"{{baseURL}}playlists"
+					],
+					"path": [
+						"{{playlistIds}}",
+						"images"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Playlist Items",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseURL}}playlists/4VHOpzgncQMU4RlEjUcgQJ/tracks",
+					"host": [
+						"{{baseURL}}playlists"
+					],
+					"path": [
+						"4VHOpzgncQMU4RlEjUcgQJ",
+						"tracks"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Playlist",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"extract playlist id\",function(){\r",
+							"    var responsedata = pm.response.json();\r",
+							"var playlistId = responsedata.id;\r",
+							"\r",
+							"pm.environment.set(\"MyplaylistId\",playlistId);\r",
+							"\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\":\"Postman\",\r\n    \"description\":\"Customize Playlist\",\r\n    \"public\":\"true\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseURL}}users/{{user_id}}/playlists",
+					"host": [
+						"{{baseURL}}users"
+					],
+					"path": [
+						"{{user_id}}",
+						"playlists"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Search Artist Top-Tracks",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"// pm.test(\"Extract Tracks id\",function(){  \r",
+							"// let response = pm.response.json();\r",
+							"// let tracks = response.tracks.map(track => track.uri);\r",
+							"// pm.collectionVariables.set(\"trackList\",JSON.stringify(tracks));\r",
+							"//     console.log(pm.collectionVariables.get(\"trackList\"));\r",
+							"// });\r",
+							"\r",
+							"\r",
+							"let response = pm.response.json().tracks;\r",
+							"\r",
+							"// let track = response.tracks[0].album.id\r",
+							"let tracks = []\r",
+							"\r",
+							"response.forEach(track => tracks.push(\"\\\"\"+track.uri+\"\\\"\"))\r",
+							"\r",
+							"pm.environment.set(\"trackList\", tracks)\r",
+							"\r",
+							"console.log(tracks)"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseURL}}artists/4gzpq5DPGxSnKTe4SA8HAU/top-tracks",
+					"host": [
+						"{{baseURL}}artists"
+					],
+					"path": [
+						"4gzpq5DPGxSnKTe4SA8HAU",
+						"top-tracks"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add Items to Playlist",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"uris\": [{{trackList}}],\r\n    \"position\":0\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseURL}}playlists/{{MyplaylistId}}/tracks",
+					"host": [
+						"{{baseURL}}playlists"
+					],
+					"path": [
+						"{{MyplaylistId}}",
+						"tracks"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"auth": {
+		"type": "oauth2",
+		"oauth2": [
+			{
+				"key": "clientSecret",
+				"value": "{{Client_Secret}}",
+				"type": "string"
+			},
+			{
+				"key": "clientId",
+				"value": "{{Client_Id}}",
+				"type": "string"
+			},
+			{
+				"key": "state",
+				"value": "",
+				"type": "string"
+			},
+			{
+				"key": "redirect_uri",
+				"value": "https://oauth.pstmn.io/v1/browser-callback",
+				"type": "string"
+			},
+			{
+				"key": "scope",
+				"value": "playlist-read-private,playlist-modify-private,playlist-modify-public,user-follow-modify,user-follow-read,user-read-email,user-read-private,user-read-currently-playing,user-read-playback-state,user-library-read,user-library-modify,user-top-read,user-read-recently-played,user-read-playback-position",
+				"type": "string"
+			},
+			{
+				"key": "authUrl",
+				"value": "https://accounts.spotify.com/authorize",
+				"type": "string"
+			},
+			{
+				"key": "grant_type",
+				"value": "authorization_code",
+				"type": "string"
+			},
+			{
+				"key": "username",
+				"value": "",
+				"type": "string"
+			},
+			{
+				"key": "password",
+				"value": "",
+				"type": "string"
+			},
+			{
+				"key": "client_authentication",
+				"value": "header",
+				"type": "string"
+			},
+			{
+				"key": "accessTokenUrl",
+				"value": "https://accounts.spotify.com/api/token",
+				"type": "string"
+			},
+			{
+				"key": "tokenName",
+				"value": "Spotify Bearer Token",
+				"type": "string"
+			},
+			{
+				"key": "addTokenTo",
+				"value": "header",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "user_id",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "playlistIds",
+			"value": ""
+		},
+		{
+			"key": "baseURL",
+			"value": "",
+			"type": "string"
+		}
+	]
+}
